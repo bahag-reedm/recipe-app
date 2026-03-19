@@ -1,6 +1,6 @@
-import axios from "axios";
-import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router";
+import { useContext, useEffect, useState } from "react";
+import { useParams } from "react-router";
+import { RecipeContext } from "../context/RecipeContext";
 
 interface RecipeDetail {
   idMeal: string;
@@ -16,33 +16,32 @@ interface RecipeDetail {
 
 const RecipeDetail = () => {
   const { id } = useParams<{ id: string }>();
+  const context = useContext(RecipeContext);
   const [recipe, setRecipe] = useState<RecipeDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchRecipeDetail = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await axios.get(
-        `https://www.themealdb.com/api/json/v1/1/lookup.php?i=${id}`,
-      );
-      const meals = response.data.meals;
-      if (meals && meals.length > 0) {
-        setRecipe(meals[0]);
-      } else {
-        setError("Recipe not found.");
-      }
-    } catch {
-      setError("Failed to load recipe details.");
-    } finally {
+  useEffect(() => {
+    if (!context) return;
+
+    const foundRecipe = context.recipes.find((r) => r.idMeal === id);
+
+    if (foundRecipe) {
+      setRecipe(foundRecipe as RecipeDetail);
+      setLoading(false);
+      return;
+    }
+
+    if (context.loading) {
+      setLoading(true);
+      return;
+    }
+
+    if (!context.loading && !foundRecipe) {
+      setError("Recipe not found.");
       setLoading(false);
     }
-  };
-
-  useEffect(() => {
-    fetchRecipeDetail();
-  }, []);
+  }, [id, context]);
 
   return (
     <div className="p-8 max-w-5xl mx-auto">

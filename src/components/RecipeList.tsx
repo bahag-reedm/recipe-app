@@ -1,6 +1,6 @@
-import axios from "axios";
-import { useEffect, useState } from "react";
+import { useContext } from "react";
 import { Link } from "react-router";
+import { RecipeContext } from "../context/RecipeContext";
 import Navbar from "./Navbar";
 
 interface RecipeData {
@@ -12,32 +12,13 @@ interface RecipeData {
 }
 
 const RecipeList = () => {
-  const [recipes, setRecipes] = useState<RecipeData[] | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [selectedLetter, setSelectedLetter] = useState("a");
+  const context = useContext(RecipeContext);
 
-  const fetchRecipeForLetter = async (letter: string = "a") => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await axios.get(
-        `https://www.themealdb.com/api/json/v1/1/search.php?f=${letter}`,
-      );
+  if (!context) {
+    return <div className="error"><p>Context not available</p></div>;
+  }
 
-      const data = response.data;
-      setRecipes(data.meals || []);
-    } catch (err) {
-      setError("Failed to load recipes. Please try again later.");
-      setRecipes([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchRecipeForLetter(selectedLetter);
-  }, [selectedLetter]);
+  const { recipes, loading, error, selectedLetter, setSelectedLetter } = context;
 
   if (loading) {
     return (
