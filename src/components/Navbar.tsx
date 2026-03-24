@@ -1,31 +1,25 @@
 import React from "react";
+import { Link, useLocation } from "react-router";
 
-interface NavbarProps {
-  selectedLetter: string;
-  onSelectLetter: (letter: string) => void;
-}
+const Navbar: React.FC = () => {
+  const location = useLocation();
 
-const alphabet = "abcdefghijklmnopqrstuvwxyz".split("");
+  const isActive = (path: string) => location.pathname === path;
 
-const Navbar: React.FC<NavbarProps> = ({ selectedLetter, onSelectLetter }) => {
   return (
     <div className="sticky top-0 z-10 bg-white/80 dark:bg-gray-900/80 backdrop-blur border-b border-gray-200 dark:border-gray-700">
-      <div className="overflow-x-auto">
-        <div className="flex gap-2 px-4 py-3 min-w-max">
-          {alphabet.map((letter) => (
-            <button
-              key={letter}
-              onClick={() => onSelectLetter(letter)}
-              className={`px-3 py-1 text-sm rounded-full transition whitespace-nowrap
-                ${
-                  selectedLetter === letter
-                    ? "bg-purple-600 text-white shadow"
-                    : "text-gray-600 dark:text-gray-300 hover:bg-purple-100 dark:hover:bg-purple-800"
-                }`}
-            >
-              {letter.toUpperCase()}
-            </button>
-          ))}
+      <div className="px-4 py-3">
+        <div className="flex gap-6">
+          <Link
+            to="/"
+            className={`text-sm font-semibold transition ${
+              isActive("/")
+                ? "text-purple-600 dark:text-purple-400"
+                : "text-gray-600 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400"
+            }`}
+          >
+            Home
+          </Link>
         </div>
       </div>
     </div>

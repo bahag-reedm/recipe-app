@@ -17,8 +17,6 @@ interface RecipeContextType {
   recipes: RecipeDetail[];
   loading: boolean;
   error: string | null;
-  selectedLetter: string;
-  setSelectedLetter: (letter: string) => void;
 }
 
 interface Props {
@@ -31,16 +29,13 @@ export const RecipeProvider = ({ children }: Props) => {
   const [recipes, setRecipes] = useState<RecipeDetail[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedLetter, setSelectedLetter] = useState("a");
 
   useEffect(() => {
     const fetchRecipes = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(
-          `https://www.themealdb.com/api/json/v1/1/search.php?f=${selectedLetter}`,
-        );
-        setRecipes(response.data.meals || []);
+        const response = await axios.get(`http://localhost:3000/recipes`);
+        setRecipes(Array.isArray(response.data) ? response.data : response.data.meals || []);
         setError(null);
       } catch (err) {
         setError("Failed to load recipes. Please try again later.");
@@ -51,10 +46,10 @@ export const RecipeProvider = ({ children }: Props) => {
     };
 
     fetchRecipes();
-  }, [selectedLetter]);
+  }, []);
 
   return (
-    <RecipeContext.Provider value={{ recipes, loading, error, selectedLetter, setSelectedLetter }}>
+    <RecipeContext.Provider value={{ recipes, loading, error }}>
       {children}
     </RecipeContext.Provider>
   );
